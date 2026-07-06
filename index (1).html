@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Sedang Dioptimalkan</title>
+  
+  <!-- Mengimpor Google Font Space Grotesk yang berkarakter Tech/Sci-fi -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Reset & CSS Variables */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    :root {
+      --space-bg: #070512;
+      --magenta: #ff007f;
+      --purple: #8a2387;
+      --orange: #ff7b00;
+      --text-white: #ffffff;
+      --card-blur: rgba(15, 12, 30, 0.4);
+      --card-border: rgba(255, 255, 255, 0.07);
+    }
+
+    body {
+      background-color: var(--space-bg);
+      color: var(--text-white);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Efek Nebula di Latar Belakang */
+    .nebula-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .nebula {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.25;
+    }
+
+    .nebula-purple {
+      width: 500px;
+      height: 500px;
+      background: var(--purple);
+      top: -10%;
+      right: 10%;
+    }
+
+    .nebula-orange {
+      width: 400px;
+      height: 400px;
+      background: var(--orange);
+      bottom: -10%;
+      left: 10%;
+    }
+
+    /* Area Pembungkus untuk Efek 3D Tilt */
+    .card-wrapper {
+      position: relative;
+      z-index: 2;
+      perspective: 1200px;
+      width: 90%;
+      max-width: 1000px;
+      margin: 20px;
+    }
+
+    /* Kartu Utama yang akan miring secara interaktif */
+    .interactive-card {
+      background: var(--card-blur);
+      border: 1px solid var(--card-border);
+      border-radius: 30px;
+      padding: 50px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 50px;
+      align-items: center;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out; /* Transisi halus saat kursor bergerak */
+    }
+
+    /* Bagian Info (Teks & Progress) */
+    .info-section {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      transform: translateZ(30px); /* Memberikan efek kedalaman visual */
+    }
+
+    .tag {
+      align-self: flex-start;
+      background: linear-gradient(90deg, var(--magenta), var(--orange));
+      padding: 6px 18px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
+    }
+
+    h1 {
+      font-size: 2.6rem;
+      font-weight: 700;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff, #a29bfe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    /* Progress Bar Pengganti Jam */
+    .progress-container {
+      margin-top: 10px;
+      max-width: 400px;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 82%; /* Nilai persentase pemeliharaan */
+      background: linear-gradient(90deg, var(--purple), var(--magenta), var(--orange));
+      border-radius: 10px;
+      position: relative;
+      animation: progressGlow 2s infinite alternate;
+    }
+
+    @keyframes progressGlow {
+      0% { filter: drop-shadow(0 0 2px var(--magenta)); }
+      100% { filter: drop-shadow(0 0 8px var(--magenta)); }
+    }
+
+    /* Bagian Visual (3D Gyroscope) */
+    .visual-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 350px;
+      transform: translateZ(50px); /* Menonjolkan animasi 3D lebih ke depan */
+    }
+
+    .gyro-container {
+      width: 260px;
+      height: 260px;
+      perspective: 1000px;
+      position: relative;
+      transform-style: preserve-3d;
+    }
+
+    /* Inti Energi (Core) di Tengah */
+    .gyro-core {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: #ffffff;
+      border-radius: 50%;
+      top: calc(50% - 20px);
+      left: calc(50% - 20px);
+      box-shadow: 0 0 40px 15px rgba(255, 0, 127, 0.8),
+                  0 0 80px 30px rgba(138, 35, 135, 0.4);
+      z-index: 10;
+    }
+
+    /* Cincin Orbital */
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      transform-style: preserve-3d;
+    }
+
+    .ring-outer {
+      border-top: 3px solid var(--magenta);
+      border-bottom: 3px solid var(--magenta);
+      animation: rotateX 7s infinite linear;
+    }
+
+    .ring-middle {
+      width: 82%;
+      height: 82%;
+      top: 9%;
+      left: 9%;
+      border-left: 3px solid var(--purple);
+      border-right: 3px solid var(--purple);
+      animation: rotateY 9s infinite linear;
+    }
+
+    .ring-inner {
+      width: 64%;
+      height: 64%;
+      top: 18%;
+      left: 18%;
+      border-top: 3px solid var(--orange);
+      border-bottom: 3px solid var(--orange);
+      animation: rotateZ 5s infinite linear;
+    }
+
+    /* Animasi Rotasi Cincin pada Sumbu yang Berbeda */
+    @keyframes rotateX {
+      0% { transform: rotateX(0deg) rotateY(30deg); }
+      100% { transform: rotateX(360deg) rotateY(30deg); }
+    }
+
+    @keyframes rotateY {
+      0% { transform: rotateY(0deg) rotateX(-45deg); }
+      100% { transform: rotateY(360deg) rotateX(-45deg); }
+    }
+
+    @keyframes rotateZ {
+      0% { transform: rotateZ(0deg) rotateX(15deg) rotateY(15deg); }
+      100% { transform: rotateZ(360deg) rotateX(15deg) rotateY(15deg); }
+    }
+
+    /* Responsive Design (Ponsel & Tablet) */
+    @media (max-width: 992px) {
+      .interactive-card {
+        grid-template-columns: 1fr;
+        padding: 40px 25px;
+        text-align: center;
+        gap: 20px;
+      }
+
+      .tag {
+        align-self: center;
+      }
+
+      h1 {
+        font-size: 2.1rem;
+      }
+
+      .progress-container {
+        margin: 10px auto 0 auto;
+        width: 100%;
+      }
+
+      .visual-section {
+        height: 280px;
+        order: -1; /* Menaruh animasi di bagian atas pada tampilan seluler */
+      }
+
+      .gyro-container {
+        width: 200px;
+        height: 200px;
+      }
+
+      .gyro-core {
+        width: 30px;
+        height: 30px;
+        top: calc(50% - 15px);
+        left: calc(50% - 15px);
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Efek Nebula di Latar Belakang -->
+  <div class="nebula-bg">
+    <div class="nebula nebula-purple"></div>
+    <div class="nebula nebula-orange"></div>
+  </div>
+
+  <!-- Wrapper Kartu Interaktif -->
+  <div class="card-wrapper" id="cardContainer">
+    
+    <main class="interactive-card" id="tiltCard">
+      
+      <!-- Bagian Teks, Status, dan Progress -->
+      <section class="info-section">
+        <div class="tag">System Update</div>
+        <h1>Membangun Pengalaman Baru</h1>
+        <p>Kami sedang melakukan integrasi sistem skala berkala untuk menghadirkan fitur-fitur baru yang lebih responsif dan aman bagi Anda. Akses akan segera dibuka kembali.</p>
+        
+        <!-- Progress Bar Pengganti Jam -->
+        <div class="progress-container">
+          <div class="progress-label">
+            <span>Tahap Optimasi</span>
+            <span>82% Selesai</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bagian Animasi 3D Gyroscope -->
+      <section class="visual-section">
+        <div class="gyro-container">
+          <div class="gyro-core"></div>
+          <div class="ring ring-outer"></div>
+          <div class="ring ring-middle"></div>
+          <div class="ring ring-inner"></div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- JavaScript Ringan untuk Efek 3D Tilt pada Desktop -->
+  <script>
+    const wrapper = document.getElementById('cardContainer');
+    const card = document.getElementById('tiltCard');
+
+    // Menghitung kemiringan berdasarkan posisi kursor mouse
+    wrapper.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left - (rect.width / 2);
+      const y = e.clientY - rect.top - (rect.height / 2);
+      
+      // Maksimal kemiringan adalah 10 derajat agar efek tetap elegan
+      const tiltX = -(y / (rect.height / 2)) * 10;
+      const tiltY = (x / (rect.width / 2)) * 10;
+
+      card.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+    });
+
+    // Mengembalikan posisi kartu ke semula saat kursor meninggalkan area
+    wrapper.addEventListener('mouseleave', () => {
+      card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+    });
+  </script>
+</body>
+</html>
